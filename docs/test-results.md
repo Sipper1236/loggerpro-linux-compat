@@ -16,6 +16,7 @@ Tested on 2026-11-15, 2026-11-23, and 2026-11-24 with Logger Pro 3.16.2 under Wi
 - Experiment → Zero on the virtual interface changed the live potential readout from about 3.35 V to about 0.10 V. The Experiment → Calibrate → Go!Link item opened the calibration dialog with sensor info, current calibration, units, and two reference-reading fields. Calibration was canceled without applying points. This checks the UI/protocol response only; zero/calibration accuracy on a physical sensor is unverified.
 - With the Basketball Shot sample open, File → Accessibility → Settings opened the Audio Graph Trace controls with both video-analysis traces selected. Start Playback emitted non-silent audio to a temporary null sink; Audio Feedback was left off, and no audio went to the physical speaker.
 - On 2026-11-24, Logger Pro ran on the project's 1920×1080 Xvfb display with a copy of `LoggerPro-validation.cmbl`. The Next Page toolbar button changed the page from Position to Velocity; Previous Page returned to Position. Zoom In changed the graph range and Zoom Out restored it. The Experiment menu rendered, and collection remained unavailable with no connected sensor. The test copy was not saved.
+- In a fresh untitled Logger Pro Xvfb session on 2026-11-24, clicking the top-bar Zoom In button changed both graph axes from 0–10 to about 2.5–7.5; Zoom Out restored 0–10. The TI-device toolbar control opened the Import From TI Device dialog. This confirms those top-bar controls respond under Wine; no TI calculator was attached.
 
 ## Observed compatibility issue
 
