@@ -49,7 +49,7 @@ The root build writes a generated DLL and assembly/object intermediates into thi
 
 ## Important limits
 
-- The protocol-aware UHID emulator has passed a visible Logger Pro collection: its Voltage (+/-10 V) sensor appeared, synthetic readings populated the graph/table, and the Stop control ended collection. Real instrument readings and sensor-specific calibration/zero remain unverified.
+- The protocol-aware UHID emulator has passed a visible Logger Pro collection: its Voltage (+/-10 V) sensor appeared, synthetic readings populated the graph/table, Stop ended collection, and Zero/calibration controls responded. Real instrument readings and sensor-specific calibration accuracy remain unverified.
 - Real Vernier and Ocean Optics hardware collection has not been tested.
 - Linux sees the integrated USB camera, but Logger Pro's Video Capture source chooser showed only microphone inputs; camera capture remains unverified under Wine.
 - Accessibility Audio Graph Trace playback emitted a signal to a temporary null sink with physical audio feedback disabled. Embossing output remains unverified.
