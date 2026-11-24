@@ -9,9 +9,9 @@ Tested on 2026-11-15, 2026-11-23, and 2026-11-24 with Logger Pro 3.16.2 under Wi
 - The sample could be saved and reopened after relinking its video to a local path. Statistics matched an independent calculation from the sample data.
 - Table entry, calculated columns, text import/export, graph/table options, histogram/FFT/strip chart, fit/statistics tools, interpolation, integration/tangent/peak tools, prediction, Data Browser, and User Parameters were exercised.
 - Multi-page add/delete and page options worked. Rectangle and oval insertion, multi-object selection, left alignment, layer ordering, graph grouping, common-Y grouping, and ungrouping worked on an unsaved test page.
-- In the installed sample, the toolbar's Next Page and Previous Page buttons navigated between “1: Position” and “2: Velocity”; Zoom In and Zoom Out changed and restored the graph scale. The Import From TI Device button opened its port/device dialog. No TI device was connected, so scanning was not tested.
-- File → Print Preview rendered the current page, including its video, graph, text, and data table. The preview was canceled without sending a print job.
-- Preferences, Accessibility Settings, Data Sharing, Printing Options, and Page Setup dialogs opened and responded. Data Sharing showed that its service was not running and was left disabled. A configured printer appeared as ready, but no print job was sent.
+- In the installed sample, the toolbar's Next Page and Previous Page buttons navigated between “1: Position” and “2: Velocity”; Zoom In and Zoom Out changed and restored the graph scale. Import From TI Device opened its port/device dialog. With no calculator attached, **Scan for Device** returned “Could not find device.”
+- File → Print Preview rendered the current page, including its video, graph, text, and data table. A separate File → Print run with **Print to file** enabled produced a PostScript file; Ghostscript converted it to a two-page A4 PDF whose first page showed the sample video, graph, text, and table. No CUPS job was queued, and the physical printer was not used.
+- Preferences, Accessibility Settings, Data Sharing, Printing Options, and Page Setup dialogs opened and responded. Data Sharing showed that its service was not running and was left disabled. Remote Save As exposed a LabArchives submenu; no external save was attempted. LabQuest Browser was unavailable without a connected LabQuest.
 - Sensor setup and data-collection dialogs opened. The triggering controls were unavailable without a connected sensor interface.
 - On 2026-11-24, Logger Pro ran on the project's 1920×1080 Xvfb display with a copy of `LoggerPro-validation.cmbl`. The Next Page toolbar button changed the page from Position to Velocity; Previous Page returned to Position. Zoom In changed the graph range and Zoom Out restored it. The Experiment menu rendered, and collection remained unavailable with no connected sensor. The test copy was not saved.
 
@@ -19,7 +19,7 @@ Tested on 2026-11-15, 2026-11-23, and 2026-11-24 with Logger Pro 3.16.2 under Wi
 
 - Help → Logger Pro Help reproducibly displayed “HelpIntro.html Not Found” under Wine 11.21, both when Logger Pro's working directory was the install root and when it was `en-US`. The CHM archive contains `HelpIntro.html`, and opening the archive directly with Wine's `hh.exe` displayed its contents. The help archive is present; the failure appears in Logger Pro's integrated Help path under Wine, but the precise cause is unresolved.
 
-One Analyze sequence once showed an internal application error in `GXSTextPen.cpp` after canceling Peak Integration and reopening Analyze. It was not reproduced after relaunch; treat it as an observed compatibility issue.
+One Analyze sequence showed an internal application error after canceling Peak Integration and reopening Analyze. The dialog reported `GXSTextPen::GXSTextPen` in `GXSTextPen_Win.cpp`, line 648. The same error dialog appeared during a preliminary Xvfb interaction where the active modal state was unclear. After a clean Wine-server restart, the sample printed successfully to a local PostScript file without reproducing it. The trigger remains unresolved.
 
 ## Verified in the virtual USB harness
 
@@ -39,5 +39,5 @@ On 2026-11-23, a second test path ran Logger Pro under Xvfb with Wine's real `wi
 - No Vernier (`08f7`) or Ocean Optics (`2457`) device was connected during testing.
 - Opening the Go!Link USB menu item against the registry-only mock failed to connect; the status remained “No device connected.”
 - Device detection against real hardware, sensor configuration, calibration/zero, collection, actual sample values, USB transfer timing, and cancellation on a real instrument remain unverified.
-- TI-device scanning, LabQuest Browser, Remote Save/remote collection, camera or video capture, Data Sharing with a client, accessibility playback/embossing, and actual printer output were not exercised end to end. Data Sharing was left disabled; no service or print job was started.
+- TI-device scanning with an attached calculator, LabQuest Browser with a LabQuest, Remote Save/remote collection, camera capture, Data Sharing with a client, accessibility playback/embossing, and physical printer output remain unverified end to end. Data Sharing was left disabled; the print test wrote to a local file instead of sending a job.
 - Bluetooth devices were explicitly out of scope.
