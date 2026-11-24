@@ -51,6 +51,7 @@ The root build writes a generated DLL and assembly/object intermediates into thi
 
 - The protocol-aware UHID emulator has passed a visible Logger Pro collection: its Voltage (+/-10 V) sensor appeared, synthetic readings populated the graph/table, and the Stop control ended collection. Real instrument readings and sensor-specific calibration/zero remain unverified.
 - Real Vernier and Ocean Optics hardware collection has not been tested.
+- Linux sees the integrated USB camera, but Logger Pro's Video Capture source chooser showed only microphone inputs; camera capture remains unverified under Wine.
 - Logger Pro's Go!Link USB menu appears with the temporary discovery entry, but selecting that discovery-only mock fails to connect. The separate UHID protocol emulator communicates with Logger Pro; real hardware remains unverified.
 - The bridge supports only the listed Logger Pro-era USB IDs and Ocean Optics IDs in its source; it does not support every Go Direct device.
 - Endpoint selection assumes alternate setting 0. Cancellation, endpoint behavior, and timing still need hardware validation.
