@@ -11,6 +11,7 @@ Tested on 2026-11-15 and 2026-11-23 with Logger Pro 3.16.2 under Wine 11.21 on L
 - Multi-page add/delete and page options worked. Rectangle and oval insertion, multi-object selection, left alignment, layer ordering, graph grouping, common-Y grouping, and ungrouping worked on an unsaved test page.
 - In the installed sample, the toolbar's Next Page and Previous Page buttons navigated between “1: Position” and “2: Velocity”; Zoom In and Zoom Out changed and restored the graph scale. The Import From TI Device button opened its port/device dialog. No TI device was connected, so scanning was not tested.
 - File → Print Preview rendered the current page, including its video, graph, text, and data table. The preview was canceled without sending a print job.
+- Preferences, Accessibility Settings, Data Sharing, Printing Options, and Page Setup dialogs opened and responded. Data Sharing showed that its service was not running and was left disabled. A configured printer appeared as ready, but no print job was sent.
 - Sensor setup and data-collection dialogs opened. The triggering controls were unavailable without a connected sensor interface.
 
 ## Observed compatibility issue
@@ -32,4 +33,5 @@ On 2026-11-23, a second test path ran Logger Pro under Xvfb with Wine's real `wi
 - No Vernier (`08f7`) or Ocean Optics (`2457`) device was connected during testing.
 - Opening the Go!Link USB menu item against the registry-only mock failed to connect; the status remained “No device connected.”
 - Device detection against real hardware, sensor configuration, calibration/zero, collection, actual sample values, USB transfer timing, and cancellation on a real instrument remain unverified.
+- TI-device scanning, LabQuest Browser, Remote Save/remote collection, camera or video capture, Data Sharing with a client, accessibility playback/embossing, and actual printer output were not exercised end to end. Data Sharing was left disabled; no service or print job was started.
 - Bluetooth devices were explicitly out of scope.

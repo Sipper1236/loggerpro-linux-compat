@@ -4,7 +4,7 @@ Experiments for running Vernier Logger Pro 3 on Linux with Wine. The project con
 
 ## Status
 
-Logger Pro 3.16.2 launched and its non-hardware workflows were exercised on Linux with Wine 11.21. Virtual tests cover the WinUSB/libusb bridge and Wine's real USB enumeration/open path. A separate temporary HID registry entry makes Logger Pro show its Go!Link USB menu item. Selecting it fails to connect, as expected: the registry entry is discovery-only and the USB mock does not implement Vernier's sensor protocol. **Sensor collection remains unverified, and no real instrument has been tested.**
+Logger Pro 3.16.2 launched and many non-hardware workflows were exercised on Linux with Wine 11.21. Virtual tests cover the WinUSB/libusb bridge and Wine's real USB enumeration/open path. A separate temporary HID registry entry makes Logger Pro show its Go!Link USB menu item. Selecting it fails to connect, as expected: the registry entry is discovery-only and the USB mock does not implement Vernier's sensor protocol. **Sensor collection remains unverified, and no real instrument has been tested.**
 
 The Bluetooth shim only prevents an unsupported BLE watcher from crashing startup. It reports no discovered devices; Bluetooth sensor support is not provided.
 
