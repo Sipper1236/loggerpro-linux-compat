@@ -1,0 +1,7 @@
+LIBRARY kernel32.dll
+EXPORTS
+  ExitProcess@4
+  CreateEventW@16
+  GetLastError@0
+  Sleep@4
+  CloseHandle@4

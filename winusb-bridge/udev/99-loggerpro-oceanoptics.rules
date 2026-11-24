@@ -1,0 +1,6 @@
+SUBSYSTEM=="usb", ATTRS{idVendor}=="2457", ATTRS{idProduct}=="1002", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="2457", ATTRS{idProduct}=="1012", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="2457", ATTRS{idProduct}=="1014", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="2457", ATTRS{idProduct}=="1022", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="2457", ATTRS{idProduct}=="1024", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="2457", ATTRS{idProduct}=="1036", MODE="0660", GROUP="wheel"

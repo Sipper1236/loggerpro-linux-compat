@@ -1,0 +1,6 @@
+*.c text eol=lf
+*.sh text eol=lf
+*.md text eol=lf
+*.py text eol=lf
+*.def text eol=lf
+*.rules text eol=lf

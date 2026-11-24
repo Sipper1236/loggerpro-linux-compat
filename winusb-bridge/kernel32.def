@@ -1,0 +1,13 @@
+LIBRARY kernel32.dll
+EXPORTS
+  SetLastError@4
+  GetLastError@0
+  SetEvent@4
+  GetFinalPathNameByHandleW@16
+  GetProcessHeap@0
+  HeapAlloc@12
+  HeapFree@12
+  CreateThread@24
+  CloseHandle@4
+  WaitForSingleObject@8
+  Sleep@4

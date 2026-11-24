@@ -1,0 +1,9 @@
+LIBRARY winusb.dll
+EXPORTS
+  WinUsb_Initialize
+  WinUsb_Free
+  WinUsb_ReadPipe
+  WinUsb_WritePipe
+  WinUsb_AbortPipe
+  WinUsb_GetOverlappedResult
+  WinUsb_GetDescriptor
