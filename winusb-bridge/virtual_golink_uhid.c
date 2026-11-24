@@ -27,6 +27,7 @@ struct packet_set {
 
 struct simulator {
     int fd;
+    bool gadget;
     bool measuring;
     uint8_t rolling_counter;
     uint8_t analog_channel;
@@ -279,6 +280,21 @@ static int send_input_packet(struct simulator *simulator,
                              const uint8_t packet[GOIO_PACKET_SIZE])
 {
     struct uhid_event event;
+    ssize_t written;
+
+    if (simulator->gadget) {
+        do {
+            written = write(simulator->fd, packet, GOIO_PACKET_SIZE);
+        } while (written < 0 && errno == EINTR);
+        if (written != GOIO_PACKET_SIZE) {
+            if (written < 0)
+                perror("write /dev/hidg0");
+            else
+                fprintf(stderr, "short write to /dev/hidg0 (%zd bytes)\n", written);
+            return -1;
+        }
+        return 0;
+    }
 
     memset(&event, 0, sizeof(event));
     event.type = UHID_INPUT2;
@@ -528,6 +544,83 @@ static int run_device(void)
     return ret;
 }
 
+static int run_gadget_device(const char *device_path)
+{
+    struct simulator simulator = {
+        .fd = -1,
+        .gadget = true,
+        .measuring = false,
+        .rolling_counter = 0,
+        .analog_channel = 1,
+        .period_ms = GOIO_DEFAULT_PERIOD_MS,
+        .next_measurement_ms = 0,
+        .sample_index = 0,
+    };
+    int ret = 0;
+
+    simulator.fd = open(device_path, O_RDWR | O_CLOEXEC);
+    if (simulator.fd < 0) {
+        perror(device_path);
+        return 1;
+    }
+
+    signal(SIGINT, stop_running);
+    signal(SIGTERM, stop_running);
+    printf("Serving the virtual Go!Link USB HID gadget through %s.\n", device_path);
+    puts("This emits synthetic voltage samples; they are not real measurements.");
+    puts("Press Ctrl-C to stop the protocol service.");
+    fflush(stdout);
+
+    while (running) {
+        struct pollfd poll_fd = {.fd = simulator.fd, .events = POLLIN};
+        int timeout_ms = -1;
+        int poll_result;
+
+        if (simulator.measuring) {
+            uint64_t now = monotonic_ms();
+            timeout_ms = now >= simulator.next_measurement_ms ? 0 :
+                         (int)(simulator.next_measurement_ms - now);
+            if (timeout_ms > 100)
+                timeout_ms = 100;
+        }
+        poll_result = poll(&poll_fd, 1, timeout_ms);
+        if (poll_result < 0) {
+            if (errno == EINTR)
+                continue;
+            perror("poll hid gadget");
+            ret = 1;
+            break;
+        }
+        if (poll_result > 0 && (poll_fd.revents & POLLIN)) {
+            uint8_t report[GOIO_PACKET_SIZE + 1] = {0};
+            ssize_t bytes_read;
+
+            do {
+                bytes_read = read(simulator.fd, report, sizeof(report));
+            } while (bytes_read < 0 && errno == EINTR);
+            if (bytes_read < 0) {
+                perror("read hid gadget");
+                ret = 1;
+                break;
+            }
+            if (bytes_read == 0)
+                break;
+            if (process_command(&simulator, report, (size_t)bytes_read) != 0) {
+                ret = 1;
+                break;
+            }
+        }
+        if (simulator.measuring && monotonic_ms() >= simulator.next_measurement_ms &&
+            send_measurement(&simulator) != 0) {
+            ret = 1;
+            break;
+        }
+    }
+
+    close(simulator.fd);
+    return ret;
+}
+
 static int self_test(void)
 {
     struct simulator simulator = {
@@ -646,8 +739,10 @@ int main(int argc, char **argv)
 {
     if (argc == 2 && strcmp(argv[1], "--self-test") == 0)
         return self_test();
+    if (argc == 3 && strcmp(argv[1], "--gadget") == 0)
+        return run_gadget_device(argv[2]);
     if (argc != 1) {
-        fprintf(stderr, "Usage: %s [--self-test]\n", argv[0]);
+        fprintf(stderr, "Usage: %s [--self-test | --gadget /dev/hidg0]\n", argv[0]);
         return 2;
     }
     return run_device();

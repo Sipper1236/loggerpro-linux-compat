@@ -8,7 +8,18 @@ Run `./build.sh`. It uses GCC, Wine's `winegcc` for the registry-only HID discov
 
 Run `./virtual_usb_test.sh` for the fuller virtual-device loop. It builds a test-only libusb backend that presents a Go!Link-shaped device (`08f7:0003`) and runs the real PE32 WinUSB DLL plus host bridge against it. It checks a device descriptor, async bulk write/read data, interrupt-pipe cancellation, and interface free. This emulates USB at the libusb boundary; it does not create a kernel-enumerated USB device or emulate the sensor's Vernier application protocol.
 
-Run `./virtual_golink_test.sh` to build the UHID emulator and check its Go!Link command responses without creating a kernel device. The test covers status/INIT, multi-packet flash reads, sensor ID/channel, period, LED and serial responses, start/stop, and the synthetic measurement packet format.
+Run `./virtual_golink_test.sh` to build the emulator and check Go!Link command responses. It runs both packet-level checks and a gadget-mode PTY transport test covering sensor ID, period set/get, start, synthetic measurement, stop, and clean shutdown. The PTY test does not verify kernel USB enumeration.
+
+An optional kernel gadget path is available for testing USB enumeration through `dummy_hcd`. It requires root to load `usb_f_hid` and configure configfs:
+
+```sh
+sudo modprobe dummy_hcd
+sudo modprobe usb_f_hid
+sudo ./virtual_golink_gadget.sh start
+./build/virtual_golink_uhid --gadget /dev/hidg0
+```
+
+In another terminal, inspect `lsusb -d 08f7:0003` and test the device with Logger Pro. Stop the protocol service with Ctrl-C, then remove the gadget with `sudo ./virtual_golink_gadget.sh stop`. This is a synthetic test device, not a physical Vernier instrument.
 
 ## Headless Logger Pro with Wine USB enumeration
 

@@ -6,3 +6,4 @@ build_dir="$source_dir/build"
 
 "$source_dir/build.sh" >/dev/null
 "$build_dir/virtual_golink_uhid" --self-test
+python3 "$source_dir/virtual_golink_gadget_io_test.py"
