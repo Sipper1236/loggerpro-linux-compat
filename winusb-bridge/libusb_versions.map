@@ -1,0 +1,4 @@
+LIBUSB_1.0 {
+  global: libusb_*;
+  local: *;
+};

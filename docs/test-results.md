@@ -19,9 +19,11 @@ One Analyze sequence once showed an internal application error in `GXSTextPen.cp
 
 This checks the bridge and API implementation. It does not emulate USB at the Linux kernel/PnP layer or implement Vernier's sensor protocol.
 
+On 2026-11-23, a second test path ran Logger Pro under Xvfb with Wine's real `wineusb.so` loading a fake `08f7:0003` libusb device. Wine logged hotplug arrival, read the descriptor, and opened it. A temporary HID registry interface then made **Experiment → Connect Interface → Go!Link → Go!Link USB** available in Logger Pro. Selecting it displayed “Could not connect”; after dismissing that dialog, the File menu still opened and the app remained responsive. The registry entry is discovery-only, not a live HID device, and the fake USB backend does not implement the GoIO sensor protocol.
+
 ## Not verified
 
 - No Vernier (`08f7`) or Ocean Optics (`2457`) device was connected during testing.
-- Logger Pro's app-level path did not issue WinUSB requests to the virtual bridge and continued to report “No device connected.”
-- Device detection, sensor configuration against hardware, calibration/zero, collection, actual sample values, USB transfer timing, and cancellation on a real instrument remain unverified.
+- Opening the Go!Link USB menu item against the registry-only mock failed to connect; the status remained “No device connected.”
+- Device detection against real hardware, sensor configuration, calibration/zero, collection, actual sample values, USB transfer timing, and cancellation on a real instrument remain unverified.
 - Bluetooth devices were explicitly out of scope.

@@ -33,6 +33,17 @@ gcc -O2 -Wall -Wextra -Werror -o "$build_dir/bridge-virtual" \
     "$source_dir/bridge.c" "$source_dir/virtual_libusb.c" \
     $(pkg-config --cflags libusb-1.0) -pthread
 
+mkdir -p "$build_dir/wineusb-backend"
+gcc -shared -fPIC -O2 -Wall -Wextra -Werror \
+    $(pkg-config --cflags libusb-1.0) \
+    -Wl,-soname,libusb-1.0.so.0 \
+    -Wl,--version-script="$source_dir/libusb_versions.map" \
+    -o "$build_dir/wineusb-backend/libusb-1.0.so.0" \
+    "$source_dir/wineusb_virtual.c" -pthread
+
+winegcc -m64 "$source_dir/virtual_hid_registry.c" \
+    -lsetupapi -ladvapi32 -o "$build_dir/virtual_hid_registry.exe"
+
 for probe in probe.c probe_no_device.c probe_virtual_usb.c; do
     base_name="${probe%.c}"
     build_coff_object "$probe" "$base_name"
