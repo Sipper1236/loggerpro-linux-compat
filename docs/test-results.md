@@ -13,7 +13,7 @@ Tested on 2026-11-15, 2026-11-23, and 2026-11-24 with Logger Pro 3.16.2 under Wi
 - File → Print Preview rendered the current page, including its video, graph, text, and data table. The preview was canceled without sending a print job.
 - Preferences, Accessibility Settings, Data Sharing, Printing Options, and Page Setup dialogs opened and responded. Data Sharing showed that its service was not running and was left disabled. A configured printer appeared as ready, but no print job was sent.
 - Sensor setup and data-collection dialogs opened. The triggering controls were unavailable without a connected sensor interface.
-- On 2026-11-24, Logger Pro ran on the project's 1920×1080 Xvfb display. The File menu opened; the Zoom In toolbar button changed the graph range, and Zoom Out restored it. No experiment data was changed.
+- On 2026-11-24, Logger Pro ran on the project's 1920×1080 Xvfb display with a copy of `LoggerPro-validation.cmbl`. The Next Page toolbar button changed the page from Position to Velocity; Previous Page returned to Position. Zoom In changed the graph range and Zoom Out restored it. The Experiment menu rendered, and collection remained unavailable with no connected sensor. The test copy was not saved.
 
 ## Observed compatibility issue
 
@@ -35,7 +35,7 @@ On 2026-11-23, a second test path ran Logger Pro under Xvfb with Wine's real `wi
 
 ## Not verified
 
-- Wine could not open a UHID device during a kernel-level enumeration attempt: `udev_add_device` reported `Permission denied` for `/dev/hidraw0`. The node was owned by `root:root` with mode `0600`, and the current user could not change it without administrator authentication. A product-scoped Vernier udev rule is now included in the repository, but it has not been installed on the host; Logger Pro discovery/connection/collection through the new protocol emulator remains unverified.
+- On 2026-11-24, the protocol-aware UHID emulator created `/dev/hidraw0` with the expected `HID_ID=0003:000008F7:00000003`, but the node remained `root:root` mode `0600`; a read/write open by the test user returned `EACCES`. Wine therefore cannot open it. A product-scoped Vernier udev rule is included in the repository but has not been installed on the host, so Logger Pro discovery, connection, and collection through the new protocol emulator remain unverified.
 - No Vernier (`08f7`) or Ocean Optics (`2457`) device was connected during testing.
 - Opening the Go!Link USB menu item against the registry-only mock failed to connect; the status remained “No device connected.”
 - Device detection against real hardware, sensor configuration, calibration/zero, collection, actual sample values, USB transfer timing, and cancellation on a real instrument remain unverified.
