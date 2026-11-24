@@ -4,7 +4,7 @@ Experiments for running Vernier Logger Pro 3 on Linux with Wine. The project con
 
 ## Status
 
-Logger Pro 3.16.2 launched and many non-hardware workflows were exercised on Linux with Wine 11.21. Virtual tests cover the WinUSB/libusb bridge, Wine's USB enumeration/open path, and Go!Link protocol packet generation. A separate temporary HID registry entry makes Logger Pro show its Go!Link USB menu item. Selecting that registry-only entry fails to connect. A new Linux UHID emulator models the Go!Link command protocol and deterministic samples, but Wine could not open this host's virtual `/dev/hidraw` node because it is root-only. **Logger Pro collection through the emulator and collection from real hardware remain unverified.**
+Logger Pro 3.16.2 launched and many non-hardware workflows were exercised on Linux with Wine 11.21. Virtual tests cover the WinUSB/libusb bridge, Wine's USB enumeration/open path, and Go!Link protocol packet generation. With the included Vernier udev rule installed, a protocol-aware Linux UHID emulator was detected by Logger Pro; its Voltage (+/-10 V) sensor populated a live readout, graph, and table during collection, and the Stop control ended collection. Virtual unplug/reconnect also disabled then restored collection while the app stayed responsive. Real hardware collection remains unverified. The emulator's deterministic samples are for compatibility testing, not lab measurements.
 
 The Bluetooth shim only prevents an unsupported BLE watcher from crashing startup. It reports no discovered devices; Bluetooth sensor support is not provided.
 
@@ -41,17 +41,17 @@ WINEPREFIX=/path/to/loggerpro-prefix ./run_loggerpro_headless.sh \
   "/path/to/loggerpro-prefix/drive_c/Program Files (x86)/Vernier Software/Logger Pro 3/LoggerPro.exe"
 ```
 
-The fake USB device appears to Wine as `08f7:0003` and produces an arrival/open record in `/tmp/loggerpro-usb-enumeration.log` by default. The launcher also adds a temporary HID discovery entry to the selected Wine prefix so the Go!Link USB menu appears; it removes that entry when Logger Pro exits. Xvfb creates an invisible 1920×1080 display for the GUI. It does not keep the computer awake or override the host's lid-close behavior; an idle inhibitor may not prevent lid-triggered suspend. The fake device does not generate Vernier sensor readings, and selecting Go!Link USB currently produces a connection error.
+The fake USB device appears to Wine as `08f7:0003` and produces an arrival/open record in `/tmp/loggerpro-usb-enumeration.log` by default. The launcher also adds a temporary HID discovery entry to the selected Wine prefix so the Go!Link USB menu appears; it removes that entry when Logger Pro exits. Xvfb creates an invisible 1920×1080 display for the GUI. It does not keep the computer awake or override the host's lid-close behavior; an idle inhibitor may not prevent lid-triggered suspend. This discovery-only fake backend does not implement the GoIO sensor protocol and selecting it produces a connection error.
 
-For the protocol-aware Linux HID emulator, first install the optional [Vernier udev rule](winusb-bridge/udev/99-loggerpro-vernier.rules) and reload udev rules. Start `winusb-bridge/build/virtual_golink_uhid` in one terminal, then start Logger Pro with `LOGGERPRO_VIRTUAL_HID_REGISTRY=0` so Wine uses the kernel-enumerated HID device instead of the discovery-only registry entry. The emulator sends deterministic synthetic voltage samples; they are for compatibility testing, not lab measurements. On the test host, Wine's udev monitor reported `Permission denied` for `/dev/hidraw0` (`root:root`, mode `0600`), so this integration path has not yet been verified there.
+For the protocol-aware Linux HID emulator, install the optional [Vernier udev rule](winusb-bridge/udev/99-loggerpro-vernier.rules) and reload udev rules. Start `winusb-bridge/build/virtual_golink_uhid` in one terminal, then start Logger Pro with `LOGGERPRO_VIRTUAL_HID_REGISTRY=0` so Wine uses the kernel-enumerated HID device instead of the discovery-only registry entry. The emulator sends deterministic synthetic voltage samples; they are for compatibility testing, not lab measurements. On the test host, the rule made the emulator's hidraw node accessible to the test user. Logger Pro detected the Voltage sensor and completed visible graph/table collection through this path.
 
 The root build writes a generated DLL and assembly/object intermediates into this directory. The USB build writes generated files under `winusb-bridge/build/`; these are ignored by Git.
 
 ## Important limits
 
-- The protocol-aware UHID emulator has not yet been tested end to end with Logger Pro; Wine needs access to its hidraw node.
+- The protocol-aware UHID emulator has passed a visible Logger Pro collection: its Voltage (+/-10 V) sensor appeared, synthetic readings populated the graph/table, and the Stop control ended collection. Real instrument readings and sensor-specific calibration/zero remain unverified.
 - Real Vernier and Ocean Optics hardware collection has not been tested.
-- Logger Pro's Go!Link USB menu appears with the temporary HID discovery entry, but selecting it fails to connect. Data collection and real hardware remain unverified.
+- Logger Pro's Go!Link USB menu appears with the temporary discovery entry, but selecting that discovery-only mock fails to connect. The separate UHID protocol emulator communicates with Logger Pro; real hardware remains unverified.
 - The bridge supports only the listed Logger Pro-era USB IDs and Ocean Optics IDs in its source; it does not support every Go Direct device.
 - Endpoint selection assumes alternate setting 0. Cancellation, endpoint behavior, and timing still need hardware validation.
 - The Bluetooth shim disables BLE discovery rather than emulating sensors.
