@@ -9,7 +9,13 @@ Tested on 2026-11-15 and 2026-11-23 with Logger Pro 3.16.2 under Wine 11.21 on L
 - The sample could be saved and reopened after relinking its video to a local path. Statistics matched an independent calculation from the sample data.
 - Table entry, calculated columns, text import/export, graph/table options, histogram/FFT/strip chart, fit/statistics tools, interpolation, integration/tangent/peak tools, prediction, Data Browser, and User Parameters were exercised.
 - Multi-page add/delete and page options worked. Rectangle and oval insertion, multi-object selection, left alignment, layer ordering, graph grouping, common-Y grouping, and ungrouping worked on an unsaved test page.
+- In the installed sample, the toolbar's Next Page and Previous Page buttons navigated between “1: Position” and “2: Velocity”; Zoom In and Zoom Out changed and restored the graph scale. The Import From TI Device button opened its port/device dialog. No TI device was connected, so scanning was not tested.
+- File → Print Preview rendered the current page, including its video, graph, text, and data table. The preview was canceled without sending a print job.
 - Sensor setup and data-collection dialogs opened. The triggering controls were unavailable without a connected sensor interface.
+
+## Observed compatibility issue
+
+- Help → Logger Pro Help reproducibly displayed “HelpIntro.html Not Found” under Wine 11.21, both when Logger Pro's working directory was the install root and when it was `en-US`. The CHM archive contains `HelpIntro.html`, and opening the archive directly with Wine's `hh.exe` displayed its contents. The help archive is present; the failure appears in Logger Pro's integrated Help path under Wine, but the precise cause is unresolved.
 
 One Analyze sequence once showed an internal application error in `GXSTextPen.cpp` after canceling Peak Integration and reopening Analyze. It was not reproduced after relaunch; treat it as an observed compatibility issue.
 

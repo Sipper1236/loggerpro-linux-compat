@@ -40,7 +40,7 @@ WINEPREFIX=/path/to/loggerpro-prefix ./run_loggerpro_headless.sh \
   "/path/to/loggerpro-prefix/drive_c/Program Files (x86)/Vernier Software/Logger Pro 3/LoggerPro.exe"
 ```
 
-The fake USB device appears to Wine as `08f7:0003` and produces an arrival/open record in `/tmp/loggerpro-usb-enumeration.log` by default. The launcher also adds a temporary HID discovery entry to the selected Wine prefix so the Go!Link USB menu appears; it removes that entry when Logger Pro exits. Xvfb creates an invisible 1920×1080 display for the GUI. It does not keep the computer awake; the desktop's lid/sleep inhibitor must remain active separately. The fake device does not generate Vernier sensor readings, and selecting Go!Link USB currently produces a connection error.
+The fake USB device appears to Wine as `08f7:0003` and produces an arrival/open record in `/tmp/loggerpro-usb-enumeration.log` by default. The launcher also adds a temporary HID discovery entry to the selected Wine prefix so the Go!Link USB menu appears; it removes that entry when Logger Pro exits. Xvfb creates an invisible 1920×1080 display for the GUI. It does not keep the computer awake or override the host's lid-close behavior; an idle inhibitor may not prevent lid-triggered suspend. The fake device does not generate Vernier sensor readings, and selecting Go!Link USB currently produces a connection error.
 
 The root build writes a generated DLL and assembly/object intermediates into this directory. The USB build writes generated files under `winusb-bridge/build/`; these are ignored by Git.
 
