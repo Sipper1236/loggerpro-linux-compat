@@ -8,6 +8,8 @@ Run `./build.sh`. It uses GCC, Wine's `winegcc` for the registry-only HID discov
 
 Run `./virtual_usb_test.sh` for the fuller virtual-device loop. It builds a test-only libusb backend that presents a Go!Link-shaped device (`08f7:0003`) and runs the real PE32 WinUSB DLL plus host bridge against it. It checks a device descriptor, async bulk write/read data, interrupt-pipe cancellation, and interface free. This emulates USB at the libusb boundary; it does not create a kernel-enumerated USB device or emulate the sensor's Vernier application protocol.
 
+Run `./virtual_golink_test.sh` to build the UHID emulator and check its Go!Link command responses without creating a kernel device. The test covers status/INIT, multi-packet flash reads, sensor ID/channel, period, LED and serial responses, start/stop, and the synthetic measurement packet format.
+
 ## Headless Logger Pro with Wine USB enumeration
 
 `run_loggerpro_headless.sh` starts Logger Pro on an Xvfb display, places `wineusb_virtual.c` ahead of the system libusb library, and adds a temporary SetupAPI HID discovery entry to the selected Wine prefix. Wine's actual `wineusb.so` sees a synthetic Go!Link (`08f7:0003`), reads its USB descriptors, opens it, and reports an arrival. The registry entry makes Logger Pro's **Experiment → Connect Interface → Go!Link → Go!Link USB** menu item available. Run it with the installed prefix and executable path:
@@ -18,6 +20,25 @@ WINEPREFIX=/path/to/loggerpro-prefix ./run_loggerpro_headless.sh \
 ```
 
 The default enumeration log is `/tmp/loggerpro-usb-enumeration.log`; override it with `LOGGERPRO_USB_ENUM_LOG`. The launcher removes its temporary registry entry when Logger Pro exits. The fake registry interface has no HID handle, and the USB mock does not implement Go!Link's sensor protocol; selecting Go!Link USB displays a connection error. This is a discovery/UI check only and must not be used for measurements. Xvfb supplies an invisible 1920×1080 X display, but it does not keep the host awake or override lid-close behavior. Check the host's lid policy; an idle inhibitor may not prevent lid-triggered suspend.
+
+## Go!Link HID protocol emulator
+
+`build/virtual_golink_uhid` creates a Linux UHID device with Go!Link's VID/PID (`08f7:0003`), handles the GoIO command packets used during open, and emits deterministic synthetic measurement reports after `START_MEASUREMENTS`. Run it in one terminal, then launch Logger Pro with the same Wine prefix in another:
+
+The packet layout and command IDs follow the public [Vernier GoIO SDK](https://github.com/VernierST/GoIO_SDK) protocol definitions; this emulator is an independent test implementation and does not include the SDK.
+
+```sh
+./build.sh
+./build/virtual_golink_uhid
+
+# In a second terminal:
+WINEPREFIX=/path/to/loggerpro-prefix \
+LOGGERPRO_VIRTUAL_HID_REGISTRY=0 \
+./run_loggerpro_headless.sh \
+  "/path/to/loggerpro-prefix/drive_c/Program Files (x86)/Vernier Software/Logger Pro 3/LoggerPro.exe"
+```
+
+The emulator requires permission to create `/dev/uhid`, and Wine must be able to open the resulting `/dev/hidraw*` node. Install `udev/99-loggerpro-vernier.rules` before creating the emulator to grant the `wheel` group access to the supported Vernier USB IDs and Go!Link HID node. This is a test device: synthetic values do not represent a calibrated sensor and must not be used in experiments. The protocol self-test does not prove Logger Pro can discover, connect, or collect from it.
 
 The Linux `bridge` binary listens only on `127.0.0.1:47821`. It accepts Vernier normal-mode IDs from the [official USB ID list](https://www.vernier.com/til/4289) for Logger Pro-era devices, including Go!Link and LabPro/LabQuest interfaces, plus Go Direct SpectroVis Plus (`0011`) and Ocean Optics `2457` spectrometers listed in Logger Pro's installed INFs. Bootloader IDs, LabQuest viewer-mode `000c` (RNDIS), and other Go Direct models are excluded; Logger Pro 3.16 documents USB support only for Go Direct SpectroVis Plus ([release notes](https://www2.vernier.com/manuals/LoggerPro3_16_ReleaseNotes.pdf)). When the interface path does not reveal a VID/PID, it selects the first matching supported device. Transfers use the endpoint byte supplied by Logger Pro and the bulk/interrupt type from alternate setting 0; alternate-setting changes are not implemented.
 
@@ -39,11 +60,12 @@ The development machine has a separate opt-in launcher that temporarily places t
 
 ## USB permissions
 
-The included rule grants the `wheel` group access to six supported Ocean Optics USB product IDs. Review it for your system before installing it:
+The optional rules grant the `wheel` group access to the listed supported Ocean Optics and Vernier device IDs. Review them for your system before installing:
 
 ```sh
 sudo install -Dm644 udev/99-loggerpro-oceanoptics.rules /etc/udev/rules.d/99-loggerpro-oceanoptics.rules
+sudo install -Dm644 udev/99-loggerpro-vernier.rules /etc/udev/rules.d/99-loggerpro-vernier.rules
 sudo udevadm control --reload-rules
 ```
 
-Reconnect the spectrometer after reloading the rules. This host-permission rule is optional and does not make Logger Pro recognize an instrument by itself.
+Reconnect physical instruments after reloading the rules. For the UHID emulator, remove and recreate the virtual device so the rule applies to its new hidraw node. These host-permission rules are optional and do not make Logger Pro recognize an instrument by themselves.

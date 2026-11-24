@@ -1,6 +1,6 @@
 # Test results
 
-Tested on 2026-11-15 and 2026-11-23 with Logger Pro 3.16.2 under Wine 11.21 on Linux. This is a record of observed behavior on one setup, not a claim of full compatibility.
+Tested on 2026-11-15, 2026-11-23, and 2026-11-24 with Logger Pro 3.16.2 under Wine 11.21 on Linux. This is a record of observed behavior on one setup, not a claim of full compatibility.
 
 ## Verified in Logger Pro
 
@@ -13,6 +13,7 @@ Tested on 2026-11-15 and 2026-11-23 with Logger Pro 3.16.2 under Wine 11.21 on L
 - File → Print Preview rendered the current page, including its video, graph, text, and data table. The preview was canceled without sending a print job.
 - Preferences, Accessibility Settings, Data Sharing, Printing Options, and Page Setup dialogs opened and responded. Data Sharing showed that its service was not running and was left disabled. A configured printer appeared as ready, but no print job was sent.
 - Sensor setup and data-collection dialogs opened. The triggering controls were unavailable without a connected sensor interface.
+- On 2026-11-24, Logger Pro ran on the project's 1920×1080 Xvfb display. The File menu opened; the Zoom In toolbar button changed the graph range, and Zoom Out restored it. No experiment data was changed.
 
 ## Observed compatibility issue
 
@@ -22,14 +23,19 @@ One Analyze sequence once showed an internal application error in `GXSTextPen.cp
 
 ## Verified in the virtual USB harness
 
-`winusb-bridge/virtual_usb_test.sh` builds and runs the native PE32 WinUSB implementation plus loopback bridge against a Go!Link-shaped virtual libusb device. It passes device descriptor retrieval, bulk write/read, interrupt-pipe cancellation, and interface release. Separate probes cover initialize/free, overlapped completion/event signaling, and the no-device Win32 error result.
+`winusb-bridge/virtual_usb_test.sh` builds and runs the native PE32 WinUSB implementation plus loopback bridge against a Go!Link-shaped virtual libusb device. It passes device descriptor retrieval, bulk write/read, interrupt-pipe cancellation, and interface release. Separate probes cover initialize/free, overlapped completion/event signaling, and the no-device Win32 error result. It passed again on 2026-11-24.
 
 This checks the bridge and API implementation. It does not emulate USB at the Linux kernel/PnP layer or implement Vernier's sensor protocol.
+
+On 2026-11-24, `winusb-bridge/virtual_golink_test.sh` built the Linux UHID emulator and passed packet-level checks for status/INIT, the 20-byte flash record split across three reports, sensor ID 2, analog channel selection, measurement period, LED/serial responses, start/stop, and measurement packet format. This validates the emulator's response builder, not Logger Pro's use of it.
+
+On 2026-11-24, the emulator created a kernel HID device with `HID_ID=0003:000008F7:00000003`, and Ctrl-C removed it cleanly. Its `/dev/hidraw0` node was `root:root` mode `0600` on this host.
 
 On 2026-11-23, a second test path ran Logger Pro under Xvfb with Wine's real `wineusb.so` loading a fake `08f7:0003` libusb device. Wine logged hotplug arrival, read the descriptor, and opened it. A temporary HID registry interface then made **Experiment → Connect Interface → Go!Link → Go!Link USB** available in Logger Pro. Selecting it displayed “Could not connect”; after dismissing that dialog, the File menu still opened and the app remained responsive. The registry entry is discovery-only, not a live HID device, and the fake USB backend does not implement the GoIO sensor protocol.
 
 ## Not verified
 
+- Wine could not open a UHID device during a kernel-level enumeration attempt: `udev_add_device` reported `Permission denied` for `/dev/hidraw0`. The node was owned by `root:root` with mode `0600`, and the current user could not change it without administrator authentication. A product-scoped Vernier udev rule is now included in the repository, but it has not been installed on the host; Logger Pro discovery/connection/collection through the new protocol emulator remains unverified.
 - No Vernier (`08f7`) or Ocean Optics (`2457`) device was connected during testing.
 - Opening the Go!Link USB menu item against the registry-only mock failed to connect; the status remained “No device connected.”
 - Device detection against real hardware, sensor configuration, calibration/zero, collection, actual sample values, USB transfer timing, and cancellation on a real instrument remain unverified.

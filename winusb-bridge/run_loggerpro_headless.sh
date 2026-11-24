@@ -24,12 +24,27 @@ export LOGGERPRO_USB_ENUM_LOG=${LOGGERPRO_USB_ENUM_LOG:-"${TMPDIR:-/tmp}/loggerp
 export WINEDEBUG=${WINEDEBUG:--all}
 wine_bin=${WINE:-wine}
 registry_helper="$build_dir/virtual_hid_registry.exe"
+registry_installed=0
 
 cleanup() {
-    "$registry_helper" remove >/dev/null 2>&1 || true
+    if [[ "$registry_installed" == 1 ]]; then
+        "$registry_helper" remove >/dev/null 2>&1 || true
+    fi
 }
 trap cleanup EXIT
-"$registry_helper" install >/dev/null
+
+case "${LOGGERPRO_VIRTUAL_HID_REGISTRY:-1}" in
+    1)
+        "$registry_helper" install >/dev/null
+        registry_installed=1
+        ;;
+    0)
+        ;;
+    *)
+        printf 'LOGGERPRO_VIRTUAL_HID_REGISTRY must be 0 or 1.\n' >&2
+        exit 2
+        ;;
+esac
 
 xvfb-run -a -s '-screen 0 1920x1080x24 -nolisten tcp' \
     bash -c 'cd -- "$(dirname -- "$1")"; exec "$2" "$1"' \

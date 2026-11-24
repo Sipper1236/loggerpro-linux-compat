@@ -1,0 +1,23 @@
+# libusb access for Vernier USB devices supported by the experimental bridge.
+SUBSYSTEM=="usb", ATTR{idVendor}=="08f7", ATTR{idProduct}=="0001", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="usb", ATTR{idVendor}=="08f7", ATTR{idProduct}=="0002", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="usb", ATTR{idVendor}=="08f7", ATTR{idProduct}=="0003", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="usb", ATTR{idVendor}=="08f7", ATTR{idProduct}=="0004", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="usb", ATTR{idVendor}=="08f7", ATTR{idProduct}=="0005", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="usb", ATTR{idVendor}=="08f7", ATTR{idProduct}=="0006", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="usb", ATTR{idVendor}=="08f7", ATTR{idProduct}=="0007", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="usb", ATTR{idVendor}=="08f7", ATTR{idProduct}=="0008", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="usb", ATTR{idVendor}=="08f7", ATTR{idProduct}=="0009", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="usb", ATTR{idVendor}=="08f7", ATTR{idProduct}=="000a", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="usb", ATTR{idVendor}=="08f7", ATTR{idProduct}=="000b", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="usb", ATTR{idVendor}=="08f7", ATTR{idProduct}=="000d", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="usb", ATTR{idVendor}=="08f7", ATTR{idProduct}=="000e", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="usb", ATTR{idVendor}=="08f7", ATTR{idProduct}=="000f", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="usb", ATTR{idVendor}=="08f7", ATTR{idProduct}=="0011", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="usb", ATTR{idVendor}=="08f7", ATTR{idProduct}=="0015", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="usb", ATTR{idVendor}=="08f7", ATTR{idProduct}=="0016", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="usb", ATTR{idVendor}=="08f7", ATTR{idProduct}=="0018", MODE="0660", GROUP="wheel"
+
+# The Go!Link is HID. Match both physical USB HID nodes and the UHID test device.
+SUBSYSTEM=="hidraw", KERNEL=="hidraw*", ATTRS{idVendor}=="08f7", ATTRS{idProduct}=="0003", MODE="0660", GROUP="wheel"
+SUBSYSTEM=="hidraw", KERNEL=="hidraw*", ENV{HID_ID}=="0003:000008F7:00000003", MODE="0660", GROUP="wheel"

@@ -32,6 +32,8 @@ gcc -O2 -Wall -Wextra -Werror -o "$build_dir/bridge" "$source_dir/bridge.c" \
 gcc -O2 -Wall -Wextra -Werror -o "$build_dir/bridge-virtual" \
     "$source_dir/bridge.c" "$source_dir/virtual_libusb.c" \
     $(pkg-config --cflags libusb-1.0) -pthread
+gcc -O2 -Wall -Wextra -Werror -o "$build_dir/virtual_golink_uhid" \
+    "$source_dir/virtual_golink_uhid.c" -pthread
 
 mkdir -p "$build_dir/wineusb-backend"
 gcc -shared -fPIC -O2 -Wall -Wextra -Werror \
